@@ -1,0 +1,19 @@
+.page {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  position: relative;
+  background-color: #eee;
+}
+
+.block {
+  position: absolute;
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+}
