@@ -1,4 +1,5 @@
 const container = document.querySelector(".container");
+const colorMap = new Map(); // Map to store colors based on dimensions
 
 function rectanglePacking(arrayWithBlocks, containerSize) {
   // Generate container
@@ -18,7 +19,6 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
 
     // Array to store the height of each column on the bottom level
     const bottomLevelHeights = new Array(containerSize.width).fill(0);
-    console.log(bottomLevelHeights);
 
     rectangles.forEach((rect) => {
       // Find the column with the minimum height on the bottom level
@@ -74,8 +74,12 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
       block.style.height = rect.height + "px";
       block.style.position = "absolute";
 
-      // Set color to block
-      block.style.backgroundColor = getRandomColor();
+      // Set color to block based on dimensions
+      const dimensionsKey = `${rect.width}-${rect.height}`;
+      if (!colorMap.has(dimensionsKey)) {
+        colorMap.set(dimensionsKey, getRandomColor());
+      }
+      block.style.backgroundColor = colorMap.get(dimensionsKey);
 
       // Set top property based on container height and rectangle y-coordinate
       block.style.top = containerSize.height - rect.y - rect.height + "px";
