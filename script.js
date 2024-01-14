@@ -5,42 +5,101 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
   function containerGeneration(value) {
     container.style.width = containerSize.width + "px";
     container.style.height = containerSize.height + "px";
+    container.style.position = "relative"; // Set container position to relative
   }
 
-  containerGeneration(containerSize);
+  // Sort blocks by height in descending order
+  arrayWithBlocks.sort((a, b) => b.height - a.height);
 
-  // Generate all rectangles
-  function rectangleGeneration(arrayWithBlocks) {
-    const colorMap = new Map();
+  // Function to pack rectangles using Bottom-Left algorithm
+  function packRectangles(rectangles) {
+    let currentX = 0;
+    let currentY = 0;
+    let maxHeightInCurrentRow = 0;
 
-    arrayWithBlocks.forEach((blockSize, index) => {
-      const rectangle = document.createElement("div");
-      rectangle.classList.add("block");
-      rectangle.style.width = blockSize.width + "px";
-      rectangle.style.height = blockSize.height + "px";
+    // Array to store the height of each column on the bottom level
+    const bottomLevelHeights = new Array(containerSize.width).fill(0);
+    console.log(bottomLevelHeights);
 
-      let color;
+    rectangles.forEach((rect) => {
+      // Find the column with the minimum height on the bottom level
+      const minColumn = bottomLevelHeights.indexOf(
+        Math.min(...bottomLevelHeights)
+      );
 
-      // Check if a block of the same size has been assigned a color before
-      if (colorMap.has(JSON.stringify(blockSize))) {
-        color = colorMap.get(JSON.stringify(blockSize));
+      if (currentX + rect.width <= containerSize.width) {
+        // Pack the rectangle at the current position
+        rect.x = currentX;
+        rect.y = currentY;
+
+        // Update the currentX position for the next rectangle
+        currentX += rect.width;
+
+        // Update the bottomLevelHeights for the columns covered by the rectangle
+        for (let i = rect.x; i < rect.x + rect.width; i++) {
+          bottomLevelHeights[i] = currentY + rect.height;
+        }
+
+        // Update the maxHeightInCurrentRow
+        if (rect.height > maxHeightInCurrentRow) {
+          maxHeightInCurrentRow = rect.height;
+        }
       } else {
-        color = getRandomColor();
-        colorMap.set(JSON.stringify(blockSize), color);
+        // Move to the next row
+        currentX = minColumn;
+        currentY = Math.min(...bottomLevelHeights); // Use the minimum height on the bottom level
+
+        // Pack the rectangle at the new position
+        rect.x = currentX;
+        rect.y = currentY;
+
+        // Update the currentX position for the next rectangle
+        currentX += rect.width;
+
+        // Update the bottomLevelHeights for the columns covered by the rectangle
+        for (let i = rect.x; i < rect.x + rect.width; i++) {
+          bottomLevelHeights[i] = currentY + rect.height;
+        }
+
+        // Reset maxHeightInCurrentRow for the new row
+        maxHeightInCurrentRow = rect.height;
       }
-
-      rectangle.style.backgroundColor = color;
-
-      // Create and append a text element with the index
-      const indexText = document.createElement("span");
-      indexText.textContent = index;
-      rectangle.appendChild(indexText);
-
-      container.appendChild(rectangle);
     });
   }
 
-  rectangleGeneration(arrayWithBlocks);
+  // Function to display rectangles in the container
+  function displayRectangles(rectangles) {
+    rectangles.forEach((rect, index) => {
+      const block = document.createElement("div");
+      block.style.width = rect.width + "px";
+      block.style.height = rect.height + "px";
+      block.style.backgroundColor = getRandomColor();
+      block.style.position = "absolute";
+
+      // Set top property based on container height and rectangle y-coordinate
+      block.style.top = containerSize.height - rect.y - rect.height + "px";
+
+      block.style.left = rect.x + "px";
+
+      // Add a number label to each block
+      const label = document.createElement("div");
+      label.textContent = index + 1; // Adding 1 to start numbering from 1
+      label.className = "block-label";
+
+      // Add block to container and label to block
+      container.appendChild(block);
+      block.appendChild(label);
+    });
+  }
+
+  // Set container size
+  containerGeneration(containerSize);
+
+  // Pack rectangles using the Bottom-Left algorithm
+  packRectangles(arrayWithBlocks);
+
+  // Display rectangles in the container
+  displayRectangles(arrayWithBlocks);
 }
 
 // Function to get a random color for demonstration purposes
@@ -59,7 +118,15 @@ rectanglePacking(
     { width: 90, height: 90 },
     { width: 80, height: 127 },
     { width: 70, height: 145 },
-    { width: 70, height: 144 },
+    { width: 70, height: 14 },
+    { width: 80, height: 127 },
+    { width: 70, height: 115 },
+    { width: 70, height: 44 },
+    { width: 70, height: 145 },
+    { width: 80, height: 127 },
+    { width: 70, height: 145 },
+    { width: 70, height: 104 },
+    { width: 70, height: 74 },
   ],
   { width: 350, height: 300 }
 );

@@ -1,19 +1,33 @@
 .page {
-  margin: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
 }
 
 .container {
   position: relative;
-  background-color: #eee;
+  border: 2px solid #333;
+  overflow: hidden;
 }
 
 .block {
-  position: absolute;
-  text-align: center;
-  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
   font-size: 12px;
+  font-weight: bold;
+}
+
+.block-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white; /* You can customize the label styling */
+  font-size: 12px;
+  font-weight: bold;
 }
