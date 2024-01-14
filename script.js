@@ -5,7 +5,6 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
   function containerGeneration(value) {
     container.style.width = containerSize.width + "px";
     container.style.height = containerSize.height + "px";
-    container.style.position = "relative"; // Set container position to relative
   }
 
   // Sort blocks by height in descending order
@@ -73,12 +72,13 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
       const block = document.createElement("div");
       block.style.width = rect.width + "px";
       block.style.height = rect.height + "px";
-      block.style.backgroundColor = getRandomColor();
       block.style.position = "absolute";
+
+      // Set color to block
+      block.style.backgroundColor = getRandomColor();
 
       // Set top property based on container height and rectangle y-coordinate
       block.style.top = containerSize.height - rect.y - rect.height + "px";
-
       block.style.left = rect.x + "px";
 
       // Add a number label to each block
