@@ -13,56 +13,38 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
 
   // Function to pack rectangles using Bottom-Left algorithm
   function packRectangles(rectangles) {
-    let currentX = 0;
-    let currentY = 0;
-    let maxHeightInCurrentRow = 0;
-
-    // Array to store the height of each column on the bottom level
-    const bottomLevelHeights = new Array(containerSize.width).fill(0);
+    let bottomLeft = { x: 0, y: 0 };
+    let columnHeights = Array(containerSize.width).fill(0);
 
     rectangles.forEach((rect) => {
-      // Find the column with the minimum height on the bottom level
-      const minColumn = bottomLevelHeights.indexOf(
-        Math.min(...bottomLevelHeights)
-      );
+      let column = bottomLeft.x;
 
-      if (currentX + rect.width <= containerSize.width) {
-        // Pack the rectangle at the current position
-        rect.x = currentX;
-        rect.y = currentY;
-
-        // Update the currentX position for the next rectangle
-        currentX += rect.width;
-
-        // Update the bottomLevelHeights for the columns covered by the rectangle
-        for (let i = rect.x; i < rect.x + rect.width; i++) {
-          bottomLevelHeights[i] = currentY + rect.height;
+      // Find the column with the minimum height
+      for (let i = 1; i < rect.width; i++) {
+        if (column + i >= containerSize.width) {
+          // If the rectangle exceeds the container width, move to the next row
+          bottomLeft.x = 0;
+          bottomLeft.y += Math.max(...columnHeights);
+          columnHeights = Array(containerSize.width).fill(0);
+          column = 0;
+          break;
         }
-
-        // Update the maxHeightInCurrentRow
-        if (rect.height > maxHeightInCurrentRow) {
-          maxHeightInCurrentRow = rect.height;
+        if (columnHeights[column + i] < columnHeights[column]) {
+          column = column + i;
         }
-      } else {
-        // Move to the next row
-        currentX = minColumn;
-        currentY = Math.min(...bottomLevelHeights); // Use the minimum height on the bottom level
-
-        // Pack the rectangle at the new position
-        rect.x = currentX;
-        rect.y = currentY;
-
-        // Update the currentX position for the next rectangle
-        currentX += rect.width;
-
-        // Update the bottomLevelHeights for the columns covered by the rectangle
-        for (let i = rect.x; i < rect.x + rect.width; i++) {
-          bottomLevelHeights[i] = currentY + rect.height;
-        }
-
-        // Reset maxHeightInCurrentRow for the new row
-        maxHeightInCurrentRow = rect.height;
       }
+
+      // Set the rectangle position
+      rect.x = column;
+      rect.y = bottomLeft.y;
+
+      // Update column heights
+      for (let i = 0; i < rect.width; i++) {
+        columnHeights[column + i] = bottomLeft.y + rect.height;
+      }
+
+      // Move to the next position
+      bottomLeft.x = column + rect.width;
     });
   }
 
