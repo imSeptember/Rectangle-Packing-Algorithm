@@ -13,35 +13,34 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
 
   // Function to pack rectangles using Bottom-Left algorithm
   function packRectangles(rectangles) {
-    let bottomLeft = { x: 0, y: 0 };
-    let columnHeights = [Array(containerSize.width).fill(0)];
-    // let columnHeights = [0];
+    let bottomLeft = { horizontal: 0, vertical: 0 };
+    // Create and Array filled with "0" where the number of "0" is container height
+    let columnHeights = [Array(containerSize.height).fill(0)];
 
     rectangles.forEach((rect) => {
-      let column = bottomLeft.x;
+      // Initialize the starting position of the current rectangle to the current x-coordinate
+      let column = bottomLeft.horizontal;
 
-      // Find the column with the minimum height
+      // If the rectangle exceeds the container width, move to the next row
       for (let i = 1; i < rect.width; i++) {
         if (column + i >= containerSize.width) {
-          // If the rectangle exceeds the container width, move to the next row
-          bottomLeft.x = 0;
-          bottomLeft.y = Math.max(...columnHeights);
+          bottomLeft.horizontal = 0;
+          bottomLeft.vertical = Math.max(...columnHeights);
           column = 0;
-          break;
         }
       }
 
       // Set the rectangle position
       rect.x = column;
-      rect.y = bottomLeft.y;
+      rect.y = bottomLeft.vertical;
 
       // Update column heights
       for (let i = 0; i < rect.width; i++) {
-        columnHeights[column + i] = bottomLeft.y + rect.height;
+        columnHeights[column + i] = bottomLeft.vertical + rect.height;
       }
 
       // Move to the next position
-      bottomLeft.x = column + rect.width;
+      bottomLeft.horizontal = column + rect.width;
     });
   }
 
@@ -116,5 +115,5 @@ rectanglePacking(
     { width: 70, height: 104 },
     { width: 70, height: 74 },
   ],
-  { width: 350, height: 1300 }
+  { width: 350, height: 1000 }
 );
