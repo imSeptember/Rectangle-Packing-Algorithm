@@ -8,13 +8,24 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
     container.style.height = containerSize.height + "px";
   }
 
-  // Sort blocks by height in descending order
-  arrayWithBlocks.sort((a, b) => b.height - a.height);
+  // Swap width and height if width is greater than height
+  arrayWithBlocks.forEach((rect) => {
+    if (rect.width > rect.height) {
+      [rect.width, rect.height] = [rect.height, rect.width];
+    }
+  });
+
+  // Sort blocks by both height and width in descending order
+  arrayWithBlocks.sort((a, b) => {
+    const areaA = a.width * a.height;
+    const areaB = b.width * b.height;
+    return areaB - areaA;
+  });
 
   // Function to pack rectangles using Bottom-Left algorithm
   function packRectangles(rectangles) {
     let bottomLeft = { horizontal: 0, vertical: 0 };
-    // Create and Array filled with "0" where the number of "0" is container height
+    // Create an array filled with "0" where the number of "0" is container height
     let columnHeights = [Array(containerSize.height).fill(0)];
 
     rectangles.forEach((rect) => {
@@ -115,5 +126,5 @@ rectanglePacking(
     { width: 70, height: 104 },
     { width: 70, height: 74 },
   ],
-  { width: 350, height: 1000 }
+  { width: 350, height: 600 }
 );
