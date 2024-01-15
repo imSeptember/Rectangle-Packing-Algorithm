@@ -1,6 +1,15 @@
 const container = document.querySelector(".container");
 const colorMap = new Map(); // Map to store colors based on dimensions
 
+fetch("input.json")
+  .then((response) => response.json())
+  .then((data) => {
+    const containerSize = data.containerSize;
+    const arrayWithBlocks = data.blocks;
+    rectanglePacking(arrayWithBlocks, containerSize);
+  })
+  .catch((error) => console.error("Error reading JSON:", error));
+
 function rectanglePacking(arrayWithBlocks, containerSize) {
   // Generate container
   function containerGeneration(value) {
@@ -9,18 +18,19 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
   }
 
   // Swap width and height if width is greater than height
-  arrayWithBlocks.forEach((rect) => {
-    if (rect.width > rect.height) {
-      [rect.width, rect.height] = [rect.height, rect.width];
-    }
-  });
+  function sortBlocks(rectangles) {
+    rectangles.forEach((rect) => {
+      if (rect.width > rect.height) {
+        [rect.width, rect.height] = [rect.height, rect.width];
+      }
+    });
 
-  // Sort blocks by both height and width in descending order
-  arrayWithBlocks.sort((a, b) => {
-    const areaA = a.width * a.height;
-    const areaB = b.width * b.height;
-    return areaB - areaA;
-  });
+    rectangles.sort((a, b) => {
+      const areaA = a.width * a.height;
+      const areaB = b.width * b.height;
+      return areaB - areaA;
+    });
+  }
 
   // Function to pack rectangles using Bottom-Left algorithm
   function packRectangles(rectangles) {
@@ -62,6 +72,8 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
       block.style.width = rect.width + "px";
       block.style.height = rect.height + "px";
       block.style.position = "absolute";
+      block.style.border = "0.1px solid #000";
+      block.style.boxSizing = "border-box";
 
       // Set color to block based on dimensions
       const dimensionsKey = `${rect.width}-${rect.height}`;
@@ -71,22 +83,31 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
       block.style.backgroundColor = colorMap.get(dimensionsKey);
 
       // Set top property based on container height and rectangle y-coordinate
-      block.style.top = containerSize.height - rect.y - rect.height + "px";
-      block.style.left = rect.x + "px";
+      const topPosition = containerSize.height - rect.y - rect.height;
+      if (topPosition < 0) {
+        // If the rectangle exceeds the container height, hide it
+        block.style.display = "none";
+      } else {
+        block.style.top = topPosition + "px";
+        block.style.left = rect.x + "px";
 
-      // Add a number label to each block
-      const label = document.createElement("div");
-      label.textContent = index + 1; // Adding 1 to start numbering from 1
-      label.className = "block-label";
+        // Add a number label to each block
+        const label = document.createElement("div");
+        label.textContent = index + 1; // Adding 1 to start numbering from 1
+        label.className = "block-label";
 
-      // Add block to container and label to block
-      container.appendChild(block);
-      block.appendChild(label);
+        // Add block to container and label to block
+        container.appendChild(block);
+        block.appendChild(label);
+      }
     });
   }
 
   // Set container size
   containerGeneration(containerSize);
+
+  // Sort rectangles based on area
+  sortBlocks(arrayWithBlocks);
 
   // Pack rectangles using the Bottom-Left algorithm
   packRectangles(arrayWithBlocks);
@@ -104,27 +125,3 @@ function getRandomColor() {
   }
   return color;
 }
-
-rectanglePacking(
-  [
-    { width: 90, height: 90 },
-    { width: 90, height: 90 },
-    { width: 80, height: 127 },
-    { width: 70, height: 145 },
-    { width: 70, height: 14 },
-    { width: 170, height: 14 },
-    { width: 80, height: 127 },
-    { width: 70, height: 115 },
-    { width: 70, height: 44 },
-    { width: 70, height: 145 },
-    { width: 80, height: 127 },
-    { width: 70, height: 145 },
-    { width: 70, height: 104 },
-    { width: 70, height: 74 },
-    { width: 80, height: 127 },
-    { width: 70, height: 145 },
-    { width: 70, height: 104 },
-    { width: 70, height: 74 },
-  ],
-  { width: 350, height: 600 }
-);
