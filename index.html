@@ -7,11 +7,7 @@
     <title>Rectangle Packing Algorithm</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .page {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        body {
             margin: 0;
         }
 
@@ -19,6 +15,10 @@
             position: relative;
             border: 2px solid #333;
             overflow: hidden;
+            width: 100vw;
+            /* Заповнити всю ширину viewport */
+            height: 100vh;
+            /* Заповнити всю висоту viewport */
         }
 
         .block-label {
@@ -33,9 +33,8 @@
     </style>
 </head>
 
-<body class="page">
-    <div class="container">
-    </div>
+<body>
+    <div class="container" id="resultContainer"></div>
     <script src="script.js"></script>
 </body>
 

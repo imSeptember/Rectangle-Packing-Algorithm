@@ -1,14 +1,35 @@
-const container = document.querySelector(".container");
-const colorMap = new Map(); // Map to store colors based on dimensions
+const container = document.getElementById("resultContainer");
+const colorMap = new Map(); // Карта для збереження кольорів за розмірами
+
+let arrayWithBlocks; // Глобальна змінна для доступу до даних у функції зміни розміру
+
+window.addEventListener("resize", () => {
+  // Оновлюємо контейнер і викликаємо алгоритм при зміні розміру вікна
+  const containerSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+  rectanglePacking(arrayWithBlocks, containerSize);
+});
 
 fetch("input.json")
   .then((response) => response.json())
   .then((data) => {
-    const containerSize = data.containerSize;
-    const arrayWithBlocks = data.blocks;
+    // Зберігаємо дані у глобальній змінній для доступу у функції зміни розміру
+    arrayWithBlocks = data.blocks;
+
+    // Викликаємо алгоритм при завантаженні сторінки
+    const containerSize = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
     rectanglePacking(arrayWithBlocks, containerSize);
   })
   .catch((error) => console.error("Error reading JSON:", error));
+
+// Решта коду залишається без змін
+
+// Решта коду залишається без змін
 
 function rectanglePacking(arrayWithBlocks, containerSize) {
   // Generate container
@@ -19,7 +40,9 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
 
   // Swap width and height if width is greater than height
   function sortBlocks(rectangles) {
-    rectangles.forEach((rect) => {
+    rectangles.forEach((rect, index) => {
+      // Добавление исходного индекса в каждый блок
+      rect.initialOrder = index;
       if (rect.width > rect.height) {
         [rect.width, rect.height] = [rect.height, rect.width];
       }
@@ -28,7 +51,10 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
     rectangles.sort((a, b) => {
       const areaA = a.width * a.height;
       const areaB = b.width * b.height;
-      return areaB - areaA;
+      const result = areaB - areaA;
+
+      // Если площади равны, используем исходные индексы для сортировки
+      return result !== 0 ? result : a.initialOrder - b.initialOrder;
     });
   }
 
@@ -67,6 +93,11 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
 
   // Function to display rectangles in the container
   function displayRectangles(rectangles) {
+    // Clear existing blocks from the container
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+
     rectangles.forEach((rect, index) => {
       const block = document.createElement("div");
       block.style.width = rect.width + "px";
@@ -91,9 +122,9 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
         block.style.top = topPosition + "px";
         block.style.left = rect.x + "px";
 
-        // Add a number label to each block
+        // Add a number label to each block using initialOrder
         const label = document.createElement("div");
-        label.textContent = index + 1; // Adding 1 to start numbering from 1
+        label.textContent = rect.initialOrder; // Adding 1 to start numbering from 1
         label.className = "block-label";
 
         // Add block to container and label to block
