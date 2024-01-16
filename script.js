@@ -59,6 +59,7 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
   }
 
   // Function to pack rectangles using Bottom-Left algorithm
+  // Function to pack rectangles using Bottom-Left algorithm
   function packRectangles(rectangles) {
     let bottomLeft = { horizontal: 0, vertical: 0 };
     // Create an array filled with "0" where the number of "0" is container height
@@ -77,17 +78,32 @@ function rectanglePacking(arrayWithBlocks, containerSize) {
         }
       }
 
-      // Set the rectangle position
-      rect.x = column;
-      rect.y = bottomLeft.vertical;
-
-      // Update column heights
+      // Check for available space in the current column
+      let availableSpace = true;
       for (let i = 0; i < rect.width; i++) {
-        columnHeights[column + i] = bottomLeft.vertical + rect.height;
+        if (columnHeights[column + i] > bottomLeft.vertical) {
+          availableSpace = false;
+          break;
+        }
       }
 
-      // Move to the next position
-      bottomLeft.horizontal = column + rect.width;
+      // If there is available space, set the rectangle position
+      if (availableSpace) {
+        rect.x = column;
+        rect.y = bottomLeft.vertical;
+
+        // Update column heights
+        for (let i = 0; i < rect.width; i++) {
+          columnHeights[column + i] = bottomLeft.vertical + rect.height;
+        }
+
+        // Move to the next position
+        bottomLeft.horizontal = column + rect.width;
+      } else {
+        // If no available space, move to the next row
+        bottomLeft.horizontal = 0;
+        bottomLeft.vertical = Math.max(...columnHeights);
+      }
     });
   }
 
